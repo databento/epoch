@@ -1,5 +1,5 @@
 [package]
-name = "epoch-cli"
+name = "epoch-to"
 authors = ["Databento <support@databento.com>"]
 version = "0.3.0"
 edition = "2021"
