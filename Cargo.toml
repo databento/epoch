@@ -1,5 +1,5 @@
 [package]
-name = "epoch"
+name = "epoch-cli"
 authors = ["Databento <support@databento.com>"]
 version = "0.3.0"
 edition = "2021"
@@ -11,6 +11,9 @@ keywords = ["epoch", "timestamps"]
 # see https://crates.io/category_slugs
 categories = ["command-line-utilities", "date-and-time", "value-formatting"]
 
+[[bin]]
+name = "epoch"
+path = "src/main.rs"
 
 [dependencies]
 anyhow = "1.0.98"
