@@ -155,6 +155,7 @@ fn main() -> anyhow::Result<()> {
         for line in stdin().lock().lines() {
             reformatter.write(&mut output, &line?)?;
             output.write_all(b"\n")?;
+            output.flush()?;
         }
     }
 
