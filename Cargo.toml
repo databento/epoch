@@ -1,0 +1,24 @@
+[package]
+name = "epoch"
+authors = ["Databento <support@databento.com>"]
+version = "0.3.0"
+edition = "2021"
+repository = "https://github.com/databento/epoch"
+description = "CLI tool for converting UNIX timestamps to human-readable date strings"
+license = "Apache-2.0"
+# maximum of 5
+keywords = ["epoch", "timestamps"]
+# see https://crates.io/category_slugs
+categories = ["command-line-utilities", "date-and-time", "value-formatting"]
+
+
+[dependencies]
+anyhow = "1.0.98"
+chrono = "0.4.41"
+clap = { version = "4.5", features = ["derive", "wrap_help"] }
+
+[dev-dependencies]
+# CLI integration tests
+assert_cmd = "2.0"
+predicates = "3.1"
+rstest = "0.26"
