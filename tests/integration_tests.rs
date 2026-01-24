@@ -1,4 +1,4 @@
-use assert_cmd::Command;
+use assert_cmd::{cargo::cargo_bin_cmd, Command};
 use predicates::{
     boolean::PredicateBooleanExt,
     ord::eq,
@@ -7,7 +7,7 @@ use predicates::{
 use rstest::*;
 
 fn cmd() -> Command {
-    Command::cargo_bin("epoch").unwrap()
+    cargo_bin_cmd!("epoch")
 }
 
 #[rstest]
@@ -23,6 +23,8 @@ fn cmd() -> Command {
     "Deserializationµs=547.261 1709152989",
     "Deserializationµs=547.261 2024-02-28T20:43:09Z"
 )]
+#[case::symbol_adjacent("€1709152989¥", "€2024-02-28T20:43:09Z¥")]
+#[case::symbol_adjacent("東京1709152989서울", "東京2024-02-28T20:43:09Z서울")]
 fn test_replacement(#[case] stdin: &str, #[case] stdout: &str) {
     cmd()
         .write_stdin(format!("{stdin}\n"))
