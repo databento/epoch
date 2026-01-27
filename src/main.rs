@@ -77,7 +77,8 @@ impl Reformatter {
             // isn't a number, so print it as `text_after`
             let (number_end, text_after) = text_iter
                 .find(|(_, c)| !NUMBERS.contains(c))
-                .map(|(i, _)| (i, &line[i..i + 1]))
+                // len_utf8 to handle multi-byte chars
+                .map(|(i, c)| (i, &line[i..i + c.len_utf8()]))
                 .unwrap_or_else(|| (line.len(), ""));
 
             // If the length of the number is less than that of the lower second bound, can skip parsing
@@ -110,8 +111,8 @@ impl Reformatter {
                     continue;
                 }
             }
-            // plus 1 for text_after
-            let text = &line[text_start..(number_end + 1).min(line.len())];
+            // plus text_after length (which may be multi-byte)
+            let text = &line[text_start..(number_end + text_after.len()).min(line.len())];
             write!(writer, "{text}",)?;
         }
         Ok(())
