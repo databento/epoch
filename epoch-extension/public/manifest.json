@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Epoch Converter",
+  "version": "1.0.3",
+  "description": "Highlight or select any Unix timestamp (epoch) to convert into human-readable date strings.",
+  "icons": {
+    "16": "icon16.png",
+    "32": "icon32.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "action": {
+    "default_icon": {
+      "16": "icon16.png",
+      "32": "icon32.png",
+      "48": "icon48.png"
+    },
+    "default_title": "Epoch Converter"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "exclude_matches": ["*://epoch.to/*", "*://*.epoch.to/*"],
+      "js": ["content.js"],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["fonts/InterVariable.woff2"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

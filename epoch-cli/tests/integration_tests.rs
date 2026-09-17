@@ -15,6 +15,10 @@ fn cmd() -> Command {
     "1709152989456 test 3 b 12768987 c",
     "2024-02-28T20:43:09.456Z test 3 b 12768987 c"
 )]
+#[case::microseconds(
+    "1709152989456789 test 3 b 12768987 c",
+    "2024-02-28T20:43:09.456789Z test 3 b 12768987 c"
+)]
 #[case::end(
     "pglbx-326[MDP30][8292](HandleTradeSummary:pcme.cpp:697):WARN:5: 2 extra order entries at event time 1705882498431161301",
     "pglbx-326[MDP30][8292](HandleTradeSummary:pcme.cpp:697):WARN:5: 2 extra order entries at event time 2024-01-22T00:14:58.431161301Z"

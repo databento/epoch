@@ -1,0 +1,5 @@
+export const POPUP_POSITION_OFFSET = 12;
+export const POPUP_CLOSE_BUTTON_PADDING = 12;
+export const POPUP_EDGE_MARGIN = 16;
+export const USER_INTERACTION_DELAY = 300;
+export const POPUP_HOVER_DELAY = 200;

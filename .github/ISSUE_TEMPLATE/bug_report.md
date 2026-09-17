@@ -21,5 +21,7 @@ Add here...
 
 ### Specifications
 
+- Product: <!-- epoch.to website, epoch-extension, or epoch-cli -->
 - OS platform:
-- Rust version:
+- Browser and version: <!-- if epoch.to or epoch-extension -->
+- Rust version: <!-- if epoch-cli -->

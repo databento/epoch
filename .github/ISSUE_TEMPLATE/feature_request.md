@@ -7,4 +7,6 @@ labels:
 
 # Feature Request
 
+- Product: <!-- epoch.to website, epoch-extension, or epoch-cli -->
+
 Please provide a detailed description of your proposal, with some examples.

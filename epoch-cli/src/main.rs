@@ -36,6 +36,7 @@ struct Reformatter {
     min_len: usize,
     bound_s: Range<i64>,
     bound_ms: Range<i64>,
+    bound_us: Range<i64>,
     bound_ns: Range<i64>,
     localize: bool,
     quote: bool,
@@ -50,12 +51,14 @@ impl Reformatter {
         let lower_s: i64 = (now - dt).timestamp();
         let bound_s = lower_s..upper_s;
         let bound_ms = lower_s * 1_000..upper_s * 1_000;
+        let bound_us = lower_s * 1_000_000..upper_s * 1_000_000;
         let bound_ns = lower_s * 1_000_000_000..upper_s * 1_000_000_000;
 
         Reformatter {
             min_len: format!("{lower_s}").len(),
             bound_s,
             bound_ms,
+            bound_us,
             bound_ns,
             localize,
             quote,
@@ -89,6 +92,8 @@ impl Reformatter {
                         Some((n * 1_000_000_000, SecondsFormat::Secs))
                     } else if self.bound_ms.contains(&n) {
                         Some((n * 1_000_000, SecondsFormat::Millis))
+                    } else if self.bound_us.contains(&n) {
+                        Some((n * 1_000, SecondsFormat::Micros))
                     } else if self.bound_ns.contains(&n) {
                         Some((n, SecondsFormat::Nanos))
                     } else {
@@ -124,6 +129,8 @@ impl Reformatter {
             (false, SecondsFormat::Secs) => "%Y-%m-%dT%H:%M:%SZ",
             (true, SecondsFormat::Millis) => "%Y-%m-%dT%H:%M:%S%.3f%Z",
             (false, SecondsFormat::Millis) => "%Y-%m-%dT%H:%M:%S%.3fZ",
+            (true, SecondsFormat::Micros) => "%Y-%m-%dT%H:%M:%S%.6f%Z",
+            (false, SecondsFormat::Micros) => "%Y-%m-%dT%H:%M:%S%.6fZ",
             (true, _) => "%Y-%m-%dT%H:%M:%S%.9f%Z",
             (false, _) => "%Y-%m-%dT%H:%M:%S%.9fZ",
         }

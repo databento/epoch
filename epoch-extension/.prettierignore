@@ -1,0 +1,5 @@
+# Build output
+dist/
+
+# Generated
+package-lock.json
