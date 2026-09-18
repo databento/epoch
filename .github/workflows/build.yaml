@@ -4,13 +4,17 @@ on:
   push:
 
 jobs:
-  build:
+  build-cli:
     strategy:
       fail-fast: false
       matrix:
         os: [macos-latest, ubuntu-latest, windows-latest]
-    name: build (${{ matrix.os }})
+    name: build-cli (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
+        working-directory: epoch-cli
 
     steps:
       - name: Checkout repository
@@ -24,18 +28,42 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
+            epoch-cli/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('epoch-cli/Cargo.toml') }}
 
       - name: Format
         run: scripts/format.sh
-        shell: bash
       - name: Build
         run: scripts/build.sh
-        shell: bash
       - name: Lint
         run: scripts/lint.sh
-        shell: bash
       - name: Test
         run: scripts/test.sh
+
+  build-extension:
+    name: build-extension (ubuntu-latest)
+    runs-on: ubuntu-latest
+    defaults:
+      run:
         shell: bash
+        working-directory: epoch-extension
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: epoch-extension/.nvmrc
+          cache: npm
+          cache-dependency-path: epoch-extension/package-lock.json
+
+      # Installs dependencies, so it must run before the checks below
+      - name: Build
+        run: scripts/build.sh
+      - name: Format
+        run: scripts/format.sh
+      - name: Lint
+        run: scripts/lint.sh
+      - name: Test
+        run: scripts/test.sh

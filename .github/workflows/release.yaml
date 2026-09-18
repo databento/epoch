@@ -31,23 +31,23 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('Cargo.lock') }}
+            epoch-cli/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('epoch-cli/Cargo.toml') }}
 
       # Tag the commit with the library version
       - name: Create git tag
         uses: salsify/action-detect-and-tag-new-version@v2
         with:
-          version-command: scripts/get_version.sh
+          version-command: epoch-cli/scripts/get_version.sh
 
       # Set release output variables
       - name: Set output
         id: vars
         run: |
-          echo "TAG_NAME=v$(scripts/get_version.sh)" >> $GITHUB_ENV
-          echo "RELEASE_NAME=$(scripts/get_version.sh)" >> $GITHUB_ENV
+          echo "TAG_NAME=v$(epoch-cli/scripts/get_version.sh)" >> $GITHUB_ENV
+          echo "RELEASE_NAME=$(epoch-cli/scripts/get_version.sh)" >> $GITHUB_ENV
           echo "## Release notes" > NOTES.md
-          sed -n '/^## /{n; :a; /^## /q; p; n; ba}' CHANGELOG.md >> NOTES.md
+          sed -n '/^## /{n; :a; /^## /q; p; n; ba}' epoch-cli/CHANGELOG.md >> NOTES.md
       # Create GitHub release
       - name: Create release
         id: create-release
@@ -64,6 +64,7 @@ jobs:
         run: rm --force NOTES.md
 
       - name: Publish to crates.io
+        working-directory: epoch-cli
         run: cargo publish --token ${CARGO_REGISTRY_TOKEN}
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.CARGO_REGISTRY_TOKEN }}
@@ -74,6 +75,11 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       TARGET_FLAGS:
+    defaults:
+      run:
+        shell: bash
+        # Running from the crate directory ensures we only pull in CLI dependencies
+        working-directory: epoch-cli
     strategy:
       fail-fast: false
       matrix:
@@ -106,14 +112,12 @@ jobs:
       run: cargo install cross
 
     - name: Set target variables
-      shell: bash
       run: |
         echo "TARGET_FLAGS=--target ${{ matrix.target }}" >> $GITHUB_ENV
         echo "TARGET_DIR=./target/${{ matrix.target }}" >> $GITHUB_ENV
 
     - name: Build release binary
-      shell: bash
-      # cd ensures we only pull in CLI dependencies
+      # Paths below are relative to epoch-cli/, the job's working directory
       run: |
         cross build --release ${{ env.TARGET_FLAGS }}
         if [ "${{ matrix.os }}" = "windows-latest" ]; then
@@ -125,14 +129,12 @@ jobs:
         echo "BIN=$bin" >> $GITHUB_ENV
 
     - name: Determine archive name
-      shell: bash
       run: |
         version="$(scripts/get_version.sh)"
         echo "ARCHIVE=epoch-$version-${{ matrix.target }}" >> $GITHUB_ENV
         echo "VERSION=$version" >> $GITHUB_ENV
 
     - name: Creating directory for archive
-      shell: bash
       run: |
         mkdir -p "$ARCHIVE"/doc
         cp "$BIN" "$ARCHIVE"/
@@ -140,7 +142,6 @@ jobs:
         cp CHANGELOG.md "$ARCHIVE"/doc/
 
     - name: Build archive (Windows)
-      shell: bash
       if: matrix.os == 'windows-latest'
       run: |
         7z a "$ARCHIVE.zip" "$ARCHIVE"
@@ -149,7 +150,6 @@ jobs:
         echo "ASSET_SUM=$ARCHIVE.zip.sha256" >> $GITHUB_ENV
 
     - name: Build archive (Unix)
-      shell: bash
       if: matrix.os != 'windows-latest'
       run: |
         tar czf "$ARCHIVE.tar.gz" "$ARCHIVE"
@@ -160,7 +160,6 @@ jobs:
     - name: Upload release archive
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      shell: bash
       # clobber to overwrite if we have to rerun the release
       run: |
         gh release upload v${{ env.VERSION }} ${{ env.ASSET }} ${{ env.ASSET_SUM }} --clobber
